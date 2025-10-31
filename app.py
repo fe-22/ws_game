@@ -1,49 +1,83 @@
 from flask import Flask, jsonify, request, render_template
+import random
+import string
+import streamlit as st
+import pandas as pd
+
+st.title("Your App Title")
+st.write("Your content here")
 
 app = Flask(__name__)
 
 # Estrutura de dados para armazenar jogos
 jogos = {}
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+def gerar_id_jogo():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
+def calcular_resultado(jogadas):
+    """Calcula o resultado do jogo pedra, papel, tesoura"""
+    if len(jogadas) < 2:
+        return "Aguardando mais jogadores..."
+    
+    if all(j == jogadas[0] for j in jogadas):
+        return "Empate!"
+    
+    # Lógica do jogo
+    jogadas_unicas = set(jogadas)
+    
+    if jogadas_unicas == {"pedra", "tesoura"}:
+        vencedor = [nome for nome, escolha in jogadas.items() if escolha == "pedra"][0]
+        return f"{vencedor} venceu com Pedra! 🪨 (quebrou tesoura)"
+    elif jogadas_unicas == {"papel", "pedra"}:
+        vencedor = [nome for nome, escolha in jogadas.items() if escolha == "papel"][0]
+        return f"{vencedor} venceu com Papel! 📄 (embrulhou pedra)"
+    elif jogadas_unicas == {"tesoura", "papel"}:
+        vencedor = [nome for nome, escolha in jogadas.items() if escolha == "tesoura"][0]
+        return f"{vencedor} venceu com Tesoura! ✂️ (cortou papel)"
+    else:
+        return "Escolhas diferentes - sem vencedor claro"
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 @app.route('/criar_jogo', methods=['POST'])
 def criar_jogo():
     data = request.get_json()
-    id_jogo = data.get("id_jogo")
     jogadores_necessarios = int(data.get("jogadores_necessarios", 2))
 
-    # Inicializa o jogo com placar e rodada
+    id_jogo = gerar_id_jogo()
+    
+    # Inicializa o jogo
     jogos[id_jogo] = {
-        "jogadores": {},             # escolhas da rodada atual
+        "jogadores": {},
         "jogadores_necessarios": jogadores_necessarios,
-        "placar": {},                # inicializa placar
+        "placar": {},
         "rodada_atual": 1,
-        "jogando": True
+        "jogando": True,
+        "historico": []
     }
 
     return jsonify({
+        "success": True,
         "mensagem": "Jogo criado com sucesso!",
-        "id_jogo": id_jogo,
-        "link_convite": f"http://127.0.0.1:8501/?jogo={id_jogo}"
+        "id_jogo": id_jogo
     })
 
-
-@app.route('/jogar/<id_jogo>/<jogador>', methods=['POST'])
-def jogar(id_jogo, jogador):
+@app.route('/jogar/<id_jogo>', methods=['POST'])
+def jogar(id_jogo):
     data = request.get_json()
+    jogador = data.get("jogador")
     escolha = data.get("escolha")
 
     if id_jogo not in jogos:
-        return jsonify({"erro": "Jogo não encontrado."}), 404
+        return jsonify({"success": False, "erro": "Jogo não encontrado."}), 404
 
     jogo = jogos[id_jogo]
 
     if not jogo["jogando"]:
-        return jsonify({"mensagem": "O jogo já foi encerrado."})
+        return jsonify({"success": False, "mensagem": "O jogo já foi encerrado."})
 
     # Registra jogada
     jogo["jogadores"][jogador] = escolha
@@ -52,60 +86,80 @@ def jogar(id_jogo, jogador):
     if jogador not in jogo["placar"]:
         jogo["placar"][jogador] = 0
 
-    # Espera todos jogarem
-    if len(jogo["jogadores"]) < jogo["jogadores_necessarios"]:
-        return jsonify({"mensagem": "Aguardando outros jogadores..."})
+    # Verifica status atual
+    jogadores_faltantes = jogo["jogadores_necessarios"] - len(jogo["jogadores"])
+    
+    if jogadores_faltantes > 0:
+        return jsonify({
+            "success": True,
+            "status": "aguardando",
+            "mensagem": f"Aguardando {jogadores_faltantes} jogador(es)...",
+            "jogadores_conectados": list(jogo["jogadores"].keys()),
+            "rodada": jogo["rodada_atual"]
+        })
 
-    # Todos jogaram -> calcular resultado da rodada
-    jogadas = list(jogo["jogadores"].values())
-    resultado = calcular_resultado(jogadas)
+    # Todos jogaram -> calcular resultado
+    resultado = calcular_resultado(jogo["jogadores"])
 
-    # Atualiza placar
-    for nome, jog in jogo["jogadores"].items():
-        if resultado.startswith(nome):
-            jogo["placar"][nome] += 1
+    # Atualiza placar para o vencedor
+    if "venceu" in resultado:
+        for nome in jogo["jogadores"]:
+            if nome in resultado:
+                jogo["placar"][nome] += 1
+
+    # Adiciona ao histórico
+    jogo["historico"].append({
+        "rodada": jogo["rodada_atual"],
+        "jogadas": jogo["jogadores"].copy(),
+        "resultado": resultado
+    })
+
+    # Prepara resposta
+    response_data = {
+        "success": True,
+        "status": "resultado",
+        "resultado": resultado,
+        "placar": jogo["placar"],
+        "rodada": jogo["rodada_atual"],
+        "jogadores": list(jogo["jogadores"].keys())
+    }
 
     # Limpa jogadas para próxima rodada
     jogo["jogadores"] = {}
     jogo["rodada_atual"] += 1
 
+    return jsonify(response_data)
+
+@app.route('/status/<id_jogo>')
+def status_jogo(id_jogo):
+    if id_jogo not in jogos:
+        return jsonify({"success": False, "erro": "Jogo não encontrado."}), 404
+
+    jogo = jogos[id_jogo]
+    
     return jsonify({
-        "resultado_rodada": resultado,
-        "placar": jogo["placar"],
-        "rodada": jogo["rodada_atual"]
+        "success": True,
+        "jogando": jogo["jogando"],
+        "jogadores_conectados": list(jogo["jogadores"].keys()),
+        "jogadores_necessarios": jogo["jogadores_necessarios"],
+        "rodada": jogo["rodada_atual"],
+        "placar": jogo["placar"]
     })
-
-
-def calcular_resultado(jogadas):
-    """Função simples para comparar jogadas"""
-    if all(j == jogadas[0] for j in jogadas):
-        return "Empate!"
-
-    # Lógica de pedra, papel, tesoura
-    if "pedra" in jogadas and "tesoura" in jogadas and "papel" not in jogadas:
-        return "Pedra venceu!"
-    elif "papel" in jogadas and "pedra" in jogadas and "tesoura" not in jogadas:
-        return "Papel venceu!"
-    elif "tesoura" in jogadas and "papel" in jogadas and "pedra" not in jogadas:
-        return "Tesoura venceu!"
-    else:
-        return "Resultado indefinido."
-
 
 @app.route('/encerrar_jogo/<id_jogo>', methods=['POST'])
 def encerrar_jogo(id_jogo):
     if id_jogo not in jogos:
-        return jsonify({"erro": "Jogo não encontrado."}), 404
+        return jsonify({"success": False, "erro": "Jogo não encontrado."}), 404
 
     jogo = jogos[id_jogo]
     placar_final = jogo.get("placar", {})
-    del jogos[id_jogo]
+    jogo["jogando"] = False
 
     return jsonify({
+        "success": True,
         "mensagem": "Jogo encerrado!",
         "placar_final": placar_final
     })
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    app.run(host='0.0.0.0', port=8000, debug=True)

@@ -2,164 +2,540 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>🪨📄✂️ Pedra, Papel e Tesoura Online</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Pedra, Papel e Tesoura - Multiplayer</title>
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            text-align: center;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
+        * {
             margin: 0;
-            height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
 
-        h1 { font-size: 2.5rem; margin-bottom: 10px; }
-
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 25px;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
             border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            margin: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            flex: 1;
         }
 
-        input, button, select {
-            font-size: 1rem;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            margin: 8px;
-        }
-
-        button {
-            background-color: #00aaff;
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
             color: white;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:hover { background-color: #0077cc; }
-
-        #resultado {
-            margin-top: 15px;
-            font-size: 1.2rem;
-            color: #ffcc00;
-        }
-
-        .convite { margin-top: 20px; }
-
-        footer {
-            background: rgba(0, 0, 0, 0.3);
-            color: #ccc;
+            padding: 30px;
             text-align: center;
-            padding: 10px;
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        footer a {
-            color: #00ffcc;
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #fd746c 0%, #ff9068 100%);
+        }
+
+        .game-id {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: 2px dashed #667eea;
+        }
+
+        .choice-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .choice-btn {
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .choice-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice-btn.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .status-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .success-box {
+            background: #e8f5e8;
+            border-left-color: #4caf50;
+        }
+
+        .error-box {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .players-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .player-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .developer-info {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .developer-info strong {
+            color: #ff6b6b;
+        }
+
+        .contact-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .footer-links {
+            margin-top: 10px;
+        }
+
+        .footer-links a {
+            color: #667eea;
             text-decoration: none;
-            transition: 0.3s;
+            margin: 0 10px;
+            transition: color 0.3s ease;
         }
 
-        footer a:hover { color: #ffffff; }
+        .footer-links a:hover {
+            color: #ff6b6b;
+        }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Pedra, Papel e Tesoura</h1>
+            <p>Jogue com seus amigos em tempo real!</p>
+        </div>
 
-<div class="card">
-    <h1>🪨📄✂️ Pedra, Papel e Tesoura</h1>
+        <div class="content">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="openTab('home')">🏠 Início</button>
+                <button class="tab-btn" onclick="openTab('create')">🎯 Criar Jogo</button>
+                <button class="tab-btn" onclick="openTab('play')">👥 Jogar</button>
+            </div>
 
-    <div id="setup">
-        <input type="text" id="idJogo" placeholder="Nome do jogo">
-        <input type="number" id="jogadores" min="2" max="10" value="2">
-        <button onclick="criarJogo()">🎮 Criar Jogo</button>
+            <!-- Tab Início -->
+            <div id="home" class="tab-content active">
+                <h2>Bem-vindo ao Jogo!</h2>
+                <div class="status-box">
+                    <h3>🎯 Como Jogar:</h3>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Crie um jogo na aba 'Criar Jogo'</li>
+                        <li>Compartilhe o ID do jogo com amigos</li>
+                        <li>Entre na aba 'Jogar' para participar</li>
+                        <li>Escolha pedra, papel ou tesoura</li>
+                        <li>Veja quem venceu cada rodada!</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Tab Criar Jogo -->
+            <div id="create" class="tab-content">
+                <h2>Criar Novo Jogo</h2>
+                <div class="form-group">
+                    <label for="players">Número de Jogadores:</label>
+                    <select id="players">
+                        <option value="2">2 Jogadores</option>
+                        <option value="3">3 Jogadores</option>
+                        <option value="4">4 Jogadores</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="criarJogo()">🎮 Criar Jogo</button>
+                
+                <div id="gameCreated" class="hidden">
+                    <div class="game-id">
+                        ID do Jogo: <span id="gameId"></span>
+                    </div>
+                    <p>Compartilhe este ID com seus amigos!</p>
+                </div>
+            </div>
+
+            <!-- Tab Jogar -->
+            <div id="play" class="tab-content">
+                <h2>Entrar no Jogo</h2>
+                <div class="form-group">
+                    <label for="gameCode">ID do Jogo:</label>
+                    <input type="text" id="gameCode" placeholder="Digite o ID do jogo">
+                </div>
+                <div class="form-group">
+                    <label for="playerName">Seu Nome:</label>
+                    <input type="text" id="playerName" placeholder="Como quer ser chamado?">
+                </div>
+                <button class="btn" onclick="entrarJogo()">🎯 Entrar no Jogo</button>
+
+                <div id="gameArea" class="hidden">
+                    <div class="status-box" id="gameStatus">
+                        Aguardando jogadores...
+                    </div>
+
+                    <div class="choice-buttons">
+                        <button class="choice-btn" onclick="escolher('pedra')">🪨 Pedra</button>
+                        <button class="choice-btn" onclick="escolher('papel')">📄 Papel</button>
+                        <button class="choice-btn" onclick="escolher('tesoura')">✂️ Tesoura</button>
+                    </div>
+
+                    <div id="playersList" class="players-list hidden">
+                        <h4>Jogadores Conectados:</h4>
+                    </div>
+
+                    <div id="gameResult" class="status-box success-box hidden"></div>
+
+                    <button class="btn btn-secondary" onclick="encerrarJogo()">⏹️ Encerrar Jogo</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="convite" class="convite" style="display: none;">
-        <p>Copie e envie o link abaixo:</p>
-        <p id="linkConvite" style="word-wrap: break-word; color:#00ffcc;"></p>
-        <button id="btnWhatsapp">📱 Convidar via WhatsApp</button>
-    </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="developer-info">
+                <strong>Desenvolvido por: Fthec</strong>
+            </div>
+            <div class="contact-info">
+                📧 Email: fernandoalexthec@gmail.com | 📱 Telefone: (11) 98217-0425
+            </div>
+            <div class="contact-info">
+                 | 📅 Ano: 2025
+            </div>
+            <div class="footer-links">
+                
+                <a href="https://home-page-76ks.onrender.com/" target="_blank">Portfólio</a>
+            </div>
+        </div>
+    </footer>
 
-    <div id="jogo" style="display: none;">
-        <h2>Faça sua jogada:</h2>
-        <button onclick="jogar('pedra')">🪨 Pedra</button>
-        <button onclick="jogar('papel')">📄 Papel</button>
-        <button onclick="jogar('tesoura')">✂️ Tesoura</button>
-        <div id="resultado"></div>
-        <div id="rodada">Rodada: 1</div>
-        <div id="placar"></div>
-        <button onclick="encerrarJogo()">🛑 Encerrar Jogo</button>
-    </div>
-</div>
+    <script>
+        let currentGameId = null;
+        let currentPlayer = null;
+        let selectedChoice = null;
+        let statusInterval = null;
 
-<footer>
-    Desenvolvido por <strong>Fthec</strong> 💻 | 
-    <a href="https://home-page-76ks.onrender.com/" target="_blank">Site Oficial</a>
-</footer>
+        function openTab(tabName) {
+            // Esconde todas as tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
 
-<script>
-    let idJogo = "";
-    let jogador = Math.floor(Math.random() * 10000);
-
-    async function criarJogo() {
-        idJogo = document.getElementById("idJogo").value.trim() || "jogo" + Math.floor(Math.random() * 1000);
-        const jogadores_necessarios = document.getElementById("jogadores").value;
-
-        const res = await fetch("/criar_jogo", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id_jogo: idJogo, jogadores_necessarios })
-        });
-        const data = await res.json();
-
-        const link = data.link_convite;
-        document.getElementById("linkConvite").innerText = link;
-        document.getElementById("btnWhatsapp").onclick = () => {
-            const msg = encodeURIComponent(`🎮 Venha jogar Pedra, Papel e Tesoura comigo! Acesse: ${link}`);
-            window.open(`https://wa.me/?text=${msg}`, "_blank");
-        };
-
-        document.getElementById("convite").style.display = "block";
-        document.getElementById("jogo").style.display = "block";
-    }
-
-    async function jogar(escolha) {
-        const res = await fetch(`/jogar/${idJogo}/${jogador}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ escolha })
-        });
-        const data = await res.json();
-
-        if (data.mensagem) {
-            document.getElementById("resultado").innerText = data.mensagem;
-        } else {
-            document.getElementById("resultado").innerText = "Resultado: " + data.resultado_rodada;
-            document.getElementById("placar").innerText = "Placar: " + JSON.stringify(data.placar);
-            document.getElementById("rodada").innerText = "Rodada: " + data.rodada;
+            // Mostra a tab selecionada
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
-    }
 
-    async function encerrarJogo() {
-        const res = await fetch(`/encerrar_jogo/${idJogo}`, { method: "POST" });
-        const data = await res.json();
-        alert("Jogo encerrado! Placar final: " + JSON.stringify(data.placar_final));
-        document.getElementById("resultado").innerText = "";
-        document.getElementById("placar").innerText = "";
-        document.getElementById("rodada").innerText = "";
-        document.getElementById("jogo").style.display = "none";
-        document.getElementById("convite").style.display = "none";
-    }
-</script>
+        async function criarJogo() {
+            const players = document.getElementById('players').value;
+            
+            try {
+                const response = await fetch('/criar_jogo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        jogadores_necessarios: parseInt(players)
+                    })
+                });
 
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('gameId').textContent = data.id_jogo;
+                    document.getElementById('gameCreated').classList.remove('hidden');
+                    currentGameId = data.id_jogo;
+                } else {
+                    alert('Erro ao criar jogo: ' + data.erro);
+                }
+            } catch (error) {
+                alert('Erro de conexão: ' + error.message);
+            }
+        }
+
+        async function entrarJogo() {
+            const gameCode = document.getElementById('gameCode').value;
+            const playerName = document.getElementById('playerName').value;
+
+            if (!gameCode || !playerName) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+
+            currentGameId = gameCode;
+            currentPlayer = playerName;
+            document.getElementById('gameArea').classList.remove('hidden');
+
+            // Inicia verificação de status
+            verificarStatus();
+            statusInterval = setInterval(verificarStatus, 2000);
+        }
+
+        async function verificarStatus() {
+            if (!currentGameId) return;
+
+            try {
+                const response = await fetch(`/status/${currentGameId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    atualizarInterface(data);
+                }
+            } catch (error) {
+                console.error('Erro ao verificar status:', error);
+            }
+        }
+
+        function atualizarInterface(data) {
+            const statusElement = document.getElementById('gameStatus');
+            const playersList = document.getElementById('playersList');
+
+            if (data.jogadores_conectados && data.jogadores_conectados.length > 0) {
+                playersList.classList.remove('hidden');
+                playersList.innerHTML = '<h4>Jogadores Conectados:</h4>' +
+                    data.jogadores_conectados.map(player => 
+                        `<div class="player-item">${player}</div>`
+                    ).join('');
+            }
+
+            statusElement.innerHTML = `
+                <strong>Rodada ${data.rodada}</strong><br>
+                Jogadores: ${data.jogadores_conectados.length}/${data.jogadores_necessarios}<br>
+                Status: ${data.jogando ? 'Jogo ativo' : 'Jogo encerrado'}
+            `;
+
+            if (data.placar && Object.keys(data.placar).length > 0) {
+                statusElement.innerHTML += '<br><strong>Placar:</strong><br>' +
+                    Object.entries(data.placar).map(([player, points]) => 
+                        `${player}: ${points} ponto(s)`
+                    ).join('<br>');
+            }
+        }
+
+        function escolher(escolha) {
+            selectedChoice = escolha;
+            
+            // Atualiza visual dos botões
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            // Envia jogada
+            enviarJogada(escolha);
+        }
+
+        async function enviarJogada(escolha) {
+            try {
+                const response = await fetch(`/jogar/${currentGameId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        jogador: currentPlayer,
+                        escolha: escolha
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.status === 'resultado') {
+                        document.getElementById('gameResult').classList.remove('hidden');
+                        document.getElementById('gameResult').innerHTML = `
+                            <h3>🎉 Resultado da Rodada!</h3>
+                            <p><strong>${data.resultado}</strong></p>
+                            <p>Próxima rodada começando...</p>
+                        `;
+                    }
+                    atualizarInterface(data);
+                }
+            } catch (error) {
+                alert('Erro ao enviar jogada: ' + error.message);
+            }
+        }
+
+        async function encerrarJogo() {
+            if (!currentGameId) return;
+
+            try {
+                const response = await fetch(`/encerrar_jogo/${currentGameId}`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Jogo encerrado! Placar final: ' + JSON.stringify(data.placar_final));
+                    clearInterval(statusInterval);
+                    document.getElementById('gameArea').classList.add('hidden');
+                }
+            } catch (error) {
+                alert('Erro ao encerrar jogo: ' + error.message);
+            }
+        }
+    </script>
 </body>
 </html>
