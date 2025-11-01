@@ -1,14 +1,8 @@
-# Virtual Environment
+# .gitignore
 venv/
-env/
-ENV/
-
-# Python
 __pycache__/
 *.pyc
 *.pyo
-*.pyd
-*.pyc
-
-# Streamlit
-.streamlit/
+.python-version
+.env
+.DS_Store
